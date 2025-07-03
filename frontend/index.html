@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI Meeting Extracter</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      height: 100vh;
+      background-image: url('https://images.unsplash.com/photo-1710056618331-6c384da680a9?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      overflow: hidden;
+    }
+
+    .container {
+      background: rgba(0, 0, 0, 0.6);
+      border: 2px solid rgba(227, 8, 8, 0.3);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 650px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 0 25px rgba(255, 0, 0, 0.4);
+      animation: glow-border 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow-border {
+      from {
+        box-shadow: 0 0 15px #ff0303;
+      }
+      to {
+        box-shadow: 0 0 35px #fe0055;
+      }
+    }
+
+    h1 {
+      font-size: 2.4em;
+      margin-bottom: 25px;
+      color: rgb(255, 255, 255);
+    }
+
+    .audio-circle {
+      width: 140px;
+      height: 140px;
+      margin: 0 auto 30px;
+      border-radius: 50%;
+      background: rgba(0, 255, 255, 0.05);
+      border: 2px solid rgb(255, 0, 0);
+      box-shadow: 0 0 25px rgba(0, 255, 255, 0.4), inset 0 0 15px rgba(0, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: pulse-circle 2s infinite;
+    }
+
+    .text-rotate {
+      animation: glow-text 1.5s infinite alternate;
+    }
+
+    @keyframes pulse-circle {
+      0% { box-shadow: 0 0 15px rgb(255, 0, 0); }
+      100% { box-shadow: 0 0 30px rgb(233, 5, 5), 0 0 50px rgb(255, 0, 0); }
+    }
+
+    @keyframes glow-text {
+      from { text-shadow: 0 0 10px rgb(255, 0, 30); }
+      to { text-shadow: 0 0 30px rgb(255, 0, 47); }
+    }
+
+    .file-upload {
+      position: relative;
+      display: inline-block;
+      margin: 20px 0;
+    }
+
+    .file-upload input[type="file"] {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    .upload-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background-color: #111;
+      padding: 12px 24px;
+      border-radius: 10px;
+      border: 2px solid rgb(255, 0, 0);
+      color: rgb(255, 255, 255);
+      font-size: 1em;
+      cursor: pointer;
+      z-index: 1;
+      animation: pulse 2s infinite;
+    }
+
+    .upload-label img {
+      width: 18px;
+      height: 18px;
+      animation: spin 3s linear infinite;
+    }
+
+    #fileNameDisplay {
+      margin-top: 12px;
+      color: #ff6666;
+      font-size: 0.95em;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 10px rgb(255, 0, 0); }
+      100% { box-shadow: 0 0 20px rgb(255, 0, 0), 0 0 30px rgb(255, 7, 7); }
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0); }
+      100% { transform: rotate(360deg); }
+    }
+
+    button {
+      padding: 12px 30px;
+      background-color: #000000;
+      color: #fff;
+      font-size: 1em;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 10px;
+      box-shadow: 0 0 12px #ff0000;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #ff2525;
+      box-shadow: 0 0 20px #ff3d3d;
+    }
+
+    .output {
+      margin-top: 30px;
+      text-align: left;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 20px;
+      border-radius: 10px;
+      max-height: 300px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      border: 1px solid rgb(255, 0, 0);
+      box-shadow: inset 0 0 10px rgba(255, 0, 0, 0.2);
+    }
+
+    .output h2 {
+      margin-bottom: 10px;
+      font-size: 1.2em;
+      color: rgb(255, 0, 0);
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 25px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>AI Meeting Extracter</h1>
+
+    <div class="audio-circle">
+      <div class="text-rotate" id="textRotator">Initializing...</div>
+    </div>
+
+    <div class="file-upload">
+      <label class="upload-label">
+        <img src="https://cdn-icons-png.flaticon.com/512/727/727245.png" alt="Audio Icon">
+        🧠 Upload Conversation
+        <input type="file" id="audioFile" accept="audio/*">
+      </label>
+      <p id="fileNameDisplay"></p>
+    </div>
+
+    <button onclick="uploadAudio()">Let's Analyze!</button>
+
+    <div class="output" id="outputSection" style="display: none;">
+      <h2>📄 Transcript</h2>
+      <div id="transcript"></div>
+      <h2>🧠 Analysis</h2>
+      <div id="analysis"></div>
+    </div>
+  </div>
+
+  <script>
+    async function uploadAudio() {
+      const fileInput = document.getElementById("audioFile");
+      const file = fileInput.files[0];
+      if (!file) {
+        alert("Please select an audio file.");
+        return;
+      }
+
+      document.getElementById("fileNameDisplay").textContent = `🎵 File: ${file.name}`;
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      document.querySelector("button").innerText = "Analyzing...";
+
+      try {
+        const response = await fetch("http://127.0.0.1:5000/upload", {
+          method: "POST",
+          body: formData
+        });
+
+        const data = await response.json();
+        document.getElementById("transcript").textContent = data.transcript;
+        document.getElementById("analysis").textContent = data.analysis;
+        document.getElementById("outputSection").style.display = "block";
+      } catch (err) {
+        alert("Error analyzing audio.");
+        console.error(err);
+      }
+
+      document.querySelector("button").innerText = "Upload & Analyze";
+    }
+
+    const texts = [
+      "🔍 Analyze ",
+      "✍️ Transcript",
+      "🤖 Automail",
+      "🧠 Summary"
+    ];
+
+    let index = 0;
+
+    function rotateText() {
+      const textElement = document.getElementById("textRotator");
+      textElement.textContent = texts[index];
+      index = (index + 1) % texts.length;
+    }
+
+    setInterval(rotateText, 2000);
+    rotateText(); // initial call
+  </script>
+</body>
+</html>

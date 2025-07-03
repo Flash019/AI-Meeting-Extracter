@@ -1,0 +1,18 @@
+pip install flask
+pip install python-dotenv
+pip install openai
+pip install git+https://github.com/openai/whisper.git
+pip install ffmpeg-python
+
+
+git --version
+
+
+
+Download python 3.9.11 for Windows and MacOs
+and enable to copy  to path
+
+
+https://www.gyan.dev/ffmpeg/builds/   ---> ffmpeg-release-essentials.zip
+88 MB .ver .sha256
+then set in environmental variable settings --> path
